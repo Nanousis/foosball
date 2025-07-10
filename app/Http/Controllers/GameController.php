@@ -7,11 +7,9 @@ use App\Models\Games;
 use App\Models\Players;
 
 function playerKValue($player) {
-    return 50 / (1 + ($player->wins + $player->losses)/300);
-}
+    $games = $player->wins + $player->losses;
 
-function pointFactor($score1, $score2) {
-    return 2 + (log10(abs($score1 - $score2) + 1)) ** 3;
+    return 16 + 14 / (1 + exp($games - 18));
 }
 
 function expectedRating($player, $opponents) {
@@ -28,14 +26,13 @@ function expectedTeamRating($players, $opponents) {
 function eloChange($players, $opponents, $i, $players_score, $opponents_score) {
     $player_rating = expectedRating($players[$i], $opponents);
     $k = playerKValue($players[$i]);
-    $p = pointFactor($players_score, $opponents_score);
 
     $actual_score = 0;
     if ($opponents_score < $players_score) {
         $actual_score = 1;
     }
 
-    return ($k * $p) * ($actual_score - $player_rating);
+    return $k * ($actual_score - $player_rating);
 }
 
 class GameController extends Controller
