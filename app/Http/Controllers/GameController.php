@@ -23,12 +23,13 @@ function expectedTeamRating($players, $opponents) {
     return (expectedRating($players[0], $opponents) + expectedRating($players[1], $opponents)) / 2;
 }
 
-function eloChange($players, $opponents, $i, $players_score, $opponents_score) {
+function eloChange($players, $opponents, $i, $did_win) {
     $player_rating = expectedRating($players[$i], $opponents);
     $k = playerKValue($players[$i]);
 
+
     $actual_score = 0;
-    if ($opponents_score < $players_score) {
+    if ($did_win) {
         $actual_score = 1;
     }
 
@@ -88,7 +89,7 @@ class GameController extends Controller
         foreach ($winner_players as $i => $player) {
             if ($player) {
                 $player->increment('wins');
-                $player->elo += eloChange($winner_players, $loser_players, $i, $winner_score, $loser_score);
+                $player->elo += eloChange($winner_players, $loser_players, $i, true);
                 $player->save();
             }
         }
@@ -97,7 +98,7 @@ class GameController extends Controller
         foreach ($loser_players as $i => $player) {
             if ($player) {
                 $player->increment('losses');
-                $player->elo += eloChange($loser_players, $winner_players, $i, $loser_score, $winner_score);
+                $player->elo += eloChange($loser_players, $winner_players, $i, false);
                 $player->save();
             }
         }
