@@ -6,6 +6,38 @@ use Illuminate\Http\Request;
 use App\Models\Games;
 use App\Models\Players;
 
+function playerKValue($player) {
+    return 50 / (1 + ($player->wins + $player->losses)/300);
+}
+
+function pointFactor($score1, $score2) {
+    return 2 + (log10(abs($score1 - $score2) + 1)) ** 3;
+}
+
+function expectedRating($player, $opponents) {
+    $e1 = 1/(1 + 10**(($opponents[0]->elo - $player->elo)/500));
+    $e2 = 1/(1 + 10**(($opponents[1]->elo - $player->elo)/500));
+
+    return ($e1 + $e2) / 2;
+}
+
+function expectedTeamRating($players, $opponents) {
+    return (expectedRating($players[0], $opponents) + expectedRating($players[1], $opponents)) / 2;
+}
+
+function eloChange($players, $opponents, $i, $players_score, $opponents_score) {
+    $player_rating = expectedRating($players[$i], $opponents);
+    $k = playerKValue($players[$i]);
+    $p = pointFactor($players_score, $opponents_score);
+
+    $actual_score = 0;
+    if ($opponents_score < $players_score) {
+        $actual_score = 1;
+    }
+
+    return ($k * $p) * ($actual_score - $player_rating);
+}
+
 class GameController extends Controller
 {
     public function store(Request $request)
@@ -44,21 +76,31 @@ class GameController extends Controller
             'winner_score' => $winner_score,
             'loser_score' => $loser_score,
         ]);
-        foreach ($winners as $winnerId) {
-            $player = Players::find($winnerId);
+
+        $winner_players = [
+            Players::find($winners[0]),
+            Players::find($winners[1])
+        ];
+
+        $loser_players = [
+            Players::find($losers[0]),
+            Players::find($losers[1])
+        ];
+
+
+        foreach ($winner_players as $i => $player) {
             if ($player) {
                 $player->increment('wins');
-                $player->elo += 50;
+                $player->elo += eloChange($winner_players, $loser_players, $i, $winner_score, $loser_score);
                 $player->save();
             }
         }
-        
+
         // Update loss count for losers
-        foreach ($losers as $loserId) {
-            $player = Players::find($loserId);
+        foreach ($loser_players as $i => $player) {
             if ($player) {
                 $player->increment('losses');
-                $player->elo -= 50;
+                $player->elo += eloChange($loser_players, $winner_players, $i, $loser_score, $winner_score);
                 $player->save();
             }
         }
