@@ -34,8 +34,8 @@
         <div class="card-body">
           <h5 class="card-title">{{ $player->name }}</h5>
           <p class="card-text">Wins: {{ $player->wins}}</p>
-          <p class="card-text">Loses: {{ $player->wins}}</p>
-          <p class="card-text">Elo: N/A</p>
+          <p class="card-text">Loses: {{ $player->losses}}</p>
+          <p class="card-text">Elo: {{ $player->elo }}</p>
           <form action="{{ route('players.delete', $player->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this player?');">
             @csrf
             @method('DELETE')

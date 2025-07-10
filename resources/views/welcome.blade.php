@@ -43,7 +43,7 @@
             </td> {{--Name--}}
             <td>{{ $player->wins }}</td> {{--Wins--}}
             <td>{{ $player->losses }}</td> {{--Loses--}}
-            <td>N/A</td> {{--Elo--}}
+            <td>{{ $player->elo }}</td> {{--Elo--}}
         </tr>
     @endforeach
       </tbody>

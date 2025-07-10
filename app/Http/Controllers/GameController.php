@@ -48,14 +48,18 @@ class GameController extends Controller
             $player = Players::find($winnerId);
             if ($player) {
                 $player->increment('wins');
+                $player->elo += 50;
+                $player->save();
             }
         }
-
+        
         // Update loss count for losers
         foreach ($losers as $loserId) {
             $player = Players::find($loserId);
             if ($player) {
                 $player->increment('losses');
+                $player->elo -= 50;
+                $player->save();
             }
         }
         return redirect()->back()->with('success', 'Game recorded successfully!');
