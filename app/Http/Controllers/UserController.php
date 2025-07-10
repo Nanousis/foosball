@@ -13,8 +13,12 @@ class UserController extends Controller
     {
         $incomingFields = $request->validate([
             'name' => 'required|min:3|max:20',
-            'avatar' => 'nullable|image|max:2048' // <-- expects image, max 2MB
+            'avatar' => 'nullable|image|max:2048',
+            'password' => 'required|string|min:2',
         ]);
+        if( $incomingFields['password'] !== env('APP_PASSWORD')) {
+            return back()->withErrors(['error' => 'Invalid password.']);
+        }
         $incomingFields['name']= strip_tags($incomingFields['name']);
 
         if ($request->hasFile('avatar')) {
@@ -24,8 +28,18 @@ class UserController extends Controller
         Players::create($incomingFields);
         return redirect()->back()->with('success', 'Player created successfully.');
     }
-    public function deleteUser($id)
+    public function deleteUser(Request $request, $id)
     {
+        // Validate password input
+        $request->validate([
+            'password' => 'required|string|min:2',
+        ]);
+
+        // Check password
+        if ($request->input('password') !== env('APP_PASSWORD')) {
+            return back()->withErrors(['error' => 'Invalid password.']);
+        }
+
         $player = Players::findOrFail($id);
 
         // Delete avatar file if it exists

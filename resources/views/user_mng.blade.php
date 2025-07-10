@@ -39,26 +39,28 @@
           <form action="{{ route('players.delete', $player->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this player?');">
             @csrf
             @method('DELETE')
+            <input type="password" name="password" class="form-control form-control-sm mt-2" placeholder="" required>
             <button type="submit" class="btn btn-danger btn-sm mt-2">Delete</button>
           </form>
         </div>
       </div>
-    @endforeach
-  </div>
-  
-  <div class="container">
-    <h2 class="mb-4">Player Registration</h2>
-    <p>Register a new player by entering their name and uploading an image.</p>
-    <form action="/register_user" method="POST" class="mb-4" enctype="multipart/form-data">
-      @csrf
-      <div class="mb-3">
-        <label for="name" class="form-label">Name</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-        <div class="mt-3">
-          <label for="avatar" class="form-label">Upload Image</label>
-          <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+      @endforeach
+    </div>
+    
+    <div class="container">
+      <h2 class="mb-4">Player Registration</h2>
+      <p>Register a new player by entering their name and uploading an image.</p>
+      <form action="{{ route("players.register_user")}}" method="POST" class="mb-4" enctype="multipart/form-data">
+        @csrf
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" class="form-control" id="name" name="name" required>
+          <div class="mt-3">
+            <label for="avatar" class="form-label">Upload Image</label>
+            <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+          </div>
         </div>
-      </div>
+      <input type="password" name="password" class="form-control form-control-sm mt-2" placeholder="" required>
       <button type="submit" class="btn btn-primary">Register</button>
     </form>
   </div>

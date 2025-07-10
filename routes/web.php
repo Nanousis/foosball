@@ -4,10 +4,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GameController;
 use App\Models\Players;
+use App\Models\Games;
 
 Route::get('/', function () {
     $players = Players::orderBy('wins', 'desc')->get();
-    return view('welcome',['players' => $players]);
+    $games = Games::with(['winner1', 'winner2', 'loser1', 'loser2'])->latest()->get();
+    return view('welcome',['players' => $players, 'games' => $games]);
 })->name('home');
 // User Management
 Route::get('/user_mng', function () {

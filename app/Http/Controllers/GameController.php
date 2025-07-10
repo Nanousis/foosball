@@ -17,8 +17,11 @@ class GameController extends Controller
             'team2.*' => 'required|exists:players,id|distinct|different:team1.0|different:team1.1',
             'team1_score' => 'required|integer|min:0',
             'team2_score' => 'required|integer|min:0',
+            'password' => 'required|string|min:2',
         ]);
-
+        if( $validated['password'] !== env('APP_PASSWORD')) {
+            return back()->withErrors(['error' => 'Invalid password.']);
+        }
         if ($validated['team1_score'] > $validated['team2_score']) {
             $winners = $validated['team1'];
             $losers = $validated['team2'];

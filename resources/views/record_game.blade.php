@@ -31,7 +31,7 @@
   <h1 class="text-center">Record Game</h1>
 
   <div class="container">
-    <form action="/record_game" method="POST" class="mb-4">
+    <form action="{{ route("games.store") }}" method="POST" class="mb-4">
       @csrf
       <div class="row">
         <!-- Team 1 -->
@@ -70,14 +70,17 @@
           </div>
           @endfor
 
-          <div class="mb-4">
+          <div class="mb-4 ">
             <label class="form-label">Team 2 Score</label>
             <input type="number" class="form-control" name="team2_score" required min="0">
           </div>
         </div>
       </div>
-
-      <button type="submit" class="btn btn-primary">Record Game</button>
+      <div class="mb-4 ">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control form-control-sm mt-2" placeholder="" required>
+      </div>
+      <button type="submit" class="btn btn-primary mt-2">Record Game</button>
     </form>
   </div>
   <script>

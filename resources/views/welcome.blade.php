@@ -51,11 +51,65 @@
     <div class="btn-primary mb-4">
         <a href="{{ route("games.store") }}" class="btn btn-primary">Record Game</a>
     </div>
+
+    <h2 class="mt-2 mb-4">Match History</h2>
+    <table class="table table-bordered table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+        <th>Date</th>
+        <th>Winners</th>
+        <th class="text-center">Score</th>
+        <th>Losers</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($games as $game)
+        <tr>
+        {{-- Date --}}
+        <td>{{ $game->created_at->format('M d, Y - H:i') }}</td>
+
+        {{-- Winners --}}
+        <td>
+            @foreach ([$game->winner1, $game->winner2] as $player)
+            @if ($player)
+                <div class="d-flex align-items-center mb-1">
+                <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
+                    style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
+                {{ $player->name }}
+                </div>
+            @endif
+            @endforeach
+        </td>
+
+        {{-- Score --}}
+        <td class="text-center align-middle">
+            {{ $game->winner_score }} - {{ $game->loser_score }}
+        </td>
+
+        {{-- Losers --}}
+        <td>
+            @foreach ([$game->loser1, $game->loser2] as $player)
+            @if ($player)
+                <div class="d-flex align-items-center mb-1">
+                <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
+                    style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
+                {{ $player->name }}
+                </div>
+            @endif
+            @endforeach
+        </td>
+        </tr>
+        @endforeach
+    </tbody>
+    </table>
+
+
     <div class="btn-secondary mb-4">
         <a href="{{ route("players.register") }}" class="btn btn-secondary">Register Player</a>
     </div>
-  <script>
 
+
+  <script>
     document.querySelectorAll("th.sortable").forEach((header, index) => {
       header.addEventListener("click", () => {
         const table = header.closest("table");
