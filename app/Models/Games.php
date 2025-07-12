@@ -12,7 +12,11 @@ class Games extends Model
         'loser1_id',
         'loser2_id',
         'winner_score',
-        'loser_score'
+        'loser_score',
+        'winner1_elo_change',
+        'winner2_elo_change',
+        'loser1_elo_change',
+        'loser2_elo_change',
     ];
 
     // Define relationships

@@ -7,13 +7,13 @@ use App\Models\Players;
 use App\Models\Games;
 
 Route::get('/', function () {
-    $players = Players::orderBy('wins', 'desc')->get();
+    $players = Players::orderBy('elo', 'desc')->get();
     $games = Games::with(['winner1', 'winner2', 'loser1', 'loser2'])->latest()->get();
     return view('welcome',['players' => $players, 'games' => $games]);
 })->name('home');
 // User Management
 Route::get('/user_mng', function () {
-    $players = Players::orderBy('wins', 'desc')->get();
+    $players = Players::orderBy('elo', 'desc')->get();
     return view('user_mng', ['players' => $players]);
 })->name('players.register');
 

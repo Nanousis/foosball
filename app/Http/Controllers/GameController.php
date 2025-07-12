@@ -65,16 +65,6 @@ class GameController extends Controller
         } else {
             return back()->withErrors(['error' => 'Draws are not allowed.']);
         }
-
-        Games::create([
-            'winner1_id' => $winners[0],
-            'winner2_id' => $winners[1],
-            'loser1_id' => $losers[0],
-            'loser2_id' => $losers[1],
-            'winner_score' => $winner_score,
-            'loser_score' => $loser_score,
-        ]);
-
         $winner_players = [
             Players::find($winners[0]),
             Players::find($winners[1])
@@ -85,11 +75,34 @@ class GameController extends Controller
             Players::find($losers[1])
         ];
 
+        $winner1_elo_change = eloChange($winner_players, $loser_players, 0, true);
+        $winner2_elo_change = eloChange($winner_players, $loser_players, 1, true);
+        $loser1_elo_change  = eloChange($loser_players, $winner_players, 0, false);
+        $loser2_elo_change  = eloChange($loser_players, $winner_players, 1, false);
+
+        
+        Games::create([
+            'winner1_id' => $winners[0],
+            'winner2_id' => $winners[1],
+            'loser1_id' => $losers[0],
+            'loser2_id' => $losers[1],
+            'winner_score' => $winner_score,
+            'loser_score' => $loser_score,
+            'winner1_elo_change' => round($winner1_elo_change),
+            'winner2_elo_change' => round($winner2_elo_change),
+            'loser1_elo_change'  => round($loser1_elo_change),
+            'loser2_elo_change'  => round($loser2_elo_change),
+        ]);
+
+
 
         foreach ($winner_players as $i => $player) {
             if ($player) {
                 $player->increment('wins');
-                $player->elo += eloChange($winner_players, $loser_players, $i, true);
+                $elo_change =  eloChange($winner_players, $loser_players, $i, true);;
+                $player->elo += $elo_change;
+                $player->total_score += $winner_score;
+                $player->games_played += 1;
                 $player->save();
             }
         }
@@ -98,7 +111,10 @@ class GameController extends Controller
         foreach ($loser_players as $i => $player) {
             if ($player) {
                 $player->increment('losses');
-                $player->elo += eloChange($loser_players, $winner_players, $i, false);
+                $elo_change = eloChange($loser_players, $winner_players, $i, false);
+                $player->elo += $elo_change;
+                $player->total_score += $loser_score;
+                $player->games_played += 1;
                 $player->save();
             }
         }

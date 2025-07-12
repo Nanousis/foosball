@@ -32,6 +32,7 @@
           <th class="sortable">Wins</th>
           <th class="sortable">Loses</th>
           <th class="sortable">Elo</th>
+          <th class="sortable">Avg. Score</th>
         </tr>
       </thead>
       <tbody>
@@ -40,10 +41,17 @@
             <td>
                 <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}" style="width: 32px; height: 32px; object-fit: cover; border-radius: 50%; margin-right: 8px;">
                 {{ $player->name }}
-            </td> {{--Name--}}
-            <td>{{ $player->wins }}</td> {{--Wins--}}
-            <td>{{ $player->losses }}</td> {{--Loses--}}
-            <td>{{ $player->elo }}</td> {{--Elo--}}
+            </td>
+            <td>{{ $player->wins }}</td>
+            <td>{{ $player->losses }}</td>
+            <td>{{ $player->elo }}</td>
+            <td>
+                @if ($player->games_played > 0)
+                {{ number_format($player->total_score / $player->games_played, 2) }}
+                @else
+                0
+                @endif
+            </td>
         </tr>
     @endforeach
       </tbody>
@@ -69,15 +77,22 @@
         <td>{{ $game->created_at->format('M d, Y - H:i') }}</td>
 
         {{-- Winners --}}
-        <td>
-            @foreach ([$game->winner1, $game->winner2] as $player)
-            @if ($player)
-                <div class="d-flex align-items-center mb-1">
-                <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
-                    style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
-                {{ $player->name }}
-                </div>
-            @endif
+        <td class="">
+            @php
+                $winnerPlayers = [
+                    [$game->winner1, $game->winner1_elo_change ?? 0],
+                    [$game->winner2, $game->winner2_elo_change ?? 0]
+                ];
+            @endphp
+            @foreach ($winnerPlayers as [$player, $change])
+                @if ($player)
+                    <div class="d-flex align-items-center mb-1">
+                        <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
+                            style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
+                        {{ $player->name }}
+                        <span class="ms-1 text-success">(+{{ round($change) }})</span>
+                    </div>
+                @endif
             @endforeach
         </td>
 
@@ -87,15 +102,22 @@
         </td>
 
         {{-- Losers --}}
-        <td>
-            @foreach ([$game->loser1, $game->loser2] as $player)
-            @if ($player)
-                <div class="d-flex align-items-center mb-1">
-                <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
-                    style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
-                {{ $player->name }}
-                </div>
-            @endif
+        <td class="">
+            @php
+                $loserPlayers = [
+                    [$game->loser1, $game->loser1_elo_change ?? 0],
+                    [$game->loser2, $game->loser2_elo_change ?? 0]
+                ];
+            @endphp
+            @foreach ($loserPlayers as [$player, $change])
+                @if ($player)
+                    <div class="d-flex align-items-center mb-1">
+                        <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
+                            style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
+                        {{ $player->name }}
+                        <span class="ms-1 text-danger">({{ round($change) }})</span>
+                    </div>
+                @endif
             @endforeach
         </td>
         </tr>
