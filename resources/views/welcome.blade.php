@@ -74,7 +74,7 @@
         @foreach ($games as $game)
         <tr>
         {{-- Date --}}
-        <td>{{ $game->created_at->format('M d, Y - H:i') }}</td>
+        <td>{{ $game->created_at->setTimezone('Europe/Paris')->format('M d, Y - H:i') }}</td>
 
         {{-- Winners --}}
         <td class="">
