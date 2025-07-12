@@ -27,7 +27,7 @@
                  style="width: 32px; height: 32px; object-fit: cover; border-radius: 50%; margin-right: 8px;">
             <span>{{ $player->name }}</span>
           </td>
-          <td class="text-center">
+          <td class="text-center" style="white-space: nowrap;">
             <span class="text-success fw-bolder">{{ $player->wins }}</span> -
             <span class="text-danger fw-bolder">{{ $player->losses }}</span>
           </td>
@@ -42,6 +42,7 @@
                   {{ number_format($winrate, 0) }}%
                 </span> W/L
               </span>
+              <hr>
               <span>{{ number_format($player->total_score / $player->games_played, 2) }} Goals</span>
             </div>
             @else

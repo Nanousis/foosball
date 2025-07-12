@@ -3,7 +3,7 @@
     <a class="navbar-brand" href="{{ route('home') }}">
       <div class="text-center">
         <h1 class="fw-bold m-0">
-          <span class="gradient-text">arm</span>
+          <span class="gradient-text">intern</span>
           <span>Foosball</span>
         </h1>
       </div>
