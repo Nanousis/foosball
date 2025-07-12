@@ -16,9 +16,6 @@ return new class extends Migration
             $table->bigIncrements("id");
             $table->string("name", 20);
             $table->string("avatar")->nullable(); // Allow null for avatar
-            $table->unsignedTinyInteger("wins")->nullable();
-            $table->unsignedTinyInteger("losses")->nullable();
-            $table->unsignedTinyInteger("elo")->nullable();
             $table->timestamps(); // Created at and updated at timestamps
             $table->softDeletes(); // Soft delete column
             $table->unique("name"); // Ensure player names are unique
