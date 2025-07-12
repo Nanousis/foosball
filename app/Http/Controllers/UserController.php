@@ -16,15 +16,37 @@ class UserController extends Controller
             'avatar' => 'nullable|image|max:2048',
             'password' => 'required|string|min:2',
         ]);
-        if( $incomingFields['password'] !== env('APP_PASSWORD')) {
+
+        if ($incomingFields['password'] !== env('APP_PASSWORD')) {
             return back()->withErrors(['error' => 'Invalid password.']);
         }
-        $incomingFields['name']= strip_tags($incomingFields['name']);
 
+        $incomingFields['name'] = strip_tags($incomingFields['name']);
+
+        $player = Players::where('name', $incomingFields['name'])->first();
+
+        if ($player) {
+            // Player already exists
+            if ($request->hasFile('avatar')) {
+                // Delete old avatar if exists
+                if ($player->avatar && Storage::disk('public')->exists($player->avatar)) {
+                    Storage::disk('public')->delete($player->avatar);
+                }
+                // Upload new avatar
+                $avatarPath = $request->file('avatar')->store('avatars', 'public');
+                $player->avatar = $avatarPath;
+                $player->save();
+                return back()->with('success', 'Avatar updated for existing player.');
+            }
+            return back()->withErrors(['error' => 'Player already exists.']);
+        }
+
+        // Player doesn't exist, create new one
         if ($request->hasFile('avatar')) {
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $incomingFields['avatar'] = $avatarPath;
         }
+
         Players::create($incomingFields);
         return redirect()->back()->with('success', 'Player created successfully.');
     }

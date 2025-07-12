@@ -1,0 +1,116 @@
+/* General Styling */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8faf8;
+  color: #333;
+}
+
+h2 {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Table Enhancements */
+.table {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.table thead {
+  background: #343a40;
+  color: white;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #e6f0ff;
+  cursor: pointer;
+}
+
+td,
+th {
+  vertical-align: middle !important;
+}
+
+/* Avatar Styling */
+img[alt] {
+  border: 2px solid #dee2e6;
+  transition: transform 0.2s ease;
+}
+img[alt]:hover {
+  transform: scale(1.1);
+}
+
+/* Buttons */
+.btn-primary, .btn-secondary {
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  transform: translateY(-2px);
+}
+
+/* ELO change indicators */
+.text-success {
+  color: #198754 !important;
+  font-weight: 500;
+}
+.text-danger {
+  color: #dc3545 !important;
+  font-weight: 500;
+}
+
+/* Responsive fixes */
+@media (max-width: 576px) {
+  h2 {
+    font-size: 1.3rem;
+  }
+  .btn {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+
+
+.gradient-text {
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn-gradient {
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  color: white;
+  border: none;
+  transition: 0.3s ease;
+}
+
+.btn-gradient:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.btn-gradient-dark {
+    background: linear-gradient(90deg, #ffffff, #cfe5ff);
+    border: 1px solid #90c2ff; /* <- outline as visible border */
+    color: #001734;
+    transition: 0.3s ease;
+}
+
+.btn-gradient-dark:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.header-primary {
+  background-color: #0072ff;
+  color: white;
+}
+
+.header-primary th {
+  background: inherit;
+  color: inherit;
+}
