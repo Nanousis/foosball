@@ -22,6 +22,9 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ route('games.store') }}">Record Game</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/nanousis/foosball">Github</a>
+        </li>
       </ul>
     </div>
   </div>
