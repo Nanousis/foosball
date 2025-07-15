@@ -114,3 +114,11 @@ img[alt]:hover {
   background: inherit;
   color: inherit;
 }
+
+.result-won {
+    background-color: var(--bs-success-bg-subtle) !important;
+}
+
+.result-lost {
+    background-color: var(--bs-danger-bg-subtle) !important;
+}
