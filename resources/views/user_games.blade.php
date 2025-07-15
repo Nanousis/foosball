@@ -6,7 +6,7 @@
 
 <div class="row my-4 gx-4">
   {{-- Player Card (Left on desktop, top on mobile) --}}
-  <div class="col-12 col-md-4 justify-content-center">
+  <div class="col-12 col-md-4  d-flex d-md-block  justify-content-center">
     <div class="card my-5 w-100" style="max-width: 18rem;">
       <img src="{{ asset('storage/' . $player->avatar) }}" class="card-img-top" alt="{{ $player->name }}"
            style="aspect-ratio: 1 / 1; object-fit: cover; width: 100%; height: 18rem;">
@@ -58,7 +58,7 @@
                   <div class="d-flex align-items-center mb-1">
                     <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
                          style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
-                    <a href="/users/{{ $player->id }}/games" class="text-decoration-none text-reset">{{ $player->name }}</a>
+                    <a href="{{ route('players.games', ['id' => $player->id]) }}" class="text-decoration-none text-reset">{{ $player->name }}</a>
                     <span class="ms-1 text-success">(+{{ round($change) }})</span>
                   </div>
                 @endif

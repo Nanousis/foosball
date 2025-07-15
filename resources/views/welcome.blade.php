@@ -22,13 +22,13 @@
         @foreach ($players as $player)
         <tr>
           <td><span class="fw-bolder">{{ round($player->elo) }}</span></td>
-          <td onclick="window.location.href='/users/{{ $player->id }}/games'">
-              <a href="/users/{{ $player->id }}/games" class="d-flex align-items-center text-decoration-none text-dark">
-                <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
-                     style="width: 32px; height: 32px; object-fit: cover; border-radius: 50%; margin-right: 8px;">
-                {{ $player->name }}
+            <td onclick="window.location.href='{{ route('players.games', ['id' => $player->id]) }}'">
+              <a href="{{ route('players.games', ['id' => $player->id]) }}" class="d-flex align-items-center text-decoration-none text-dark">
+              <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
+                 style="width: 32px; height: 32px; object-fit: cover; border-radius: 50%; margin-right: 8px;">
+              {{ $player->name }}
               </a>
-          </td>
+            </td>
           <td class="text-center" style="white-space: nowrap;">
             <span class="text-success fw-bolder">{{ $player->wins }}</span> -
             <span class="text-danger fw-bolder">{{ $player->losses }}</span>
