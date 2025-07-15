@@ -4,62 +4,17 @@
 
 @section('content')
 
-  <h1 class="text-center my-3">
-    <span class="">Foosball Rankings</span>
-  </h1>
-  {{-- Player Table --}}
-  <div class="table-responsive">
-    <table id="playerTable" class="table table-bordered table-striped table-hover">
-      <thead class="">
-        <tr class="header-primary">
-          <th class="sortable">Elo</th>
-          <th class="sortable">Name</th>
-          <th class="sortable">W-L</th>
-          <th class="sortable">Stats</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach ($players as $player)
-        <tr>
-          <td><span class="fw-bolder">{{ round($player->elo) }}</span></td>
-          <td onclick="window.location.href='/users/{{ $player->id }}/games'">
-              <a href="/users/{{ $player->id }}/games" class="d-flex align-items-center text-decoration-none text-dark">
-                <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
-                     style="width: 32px; height: 32px; object-fit: cover; border-radius: 50%; margin-right: 8px;">
-                {{ $player->name }}
-              </a>
-          </td>
-          <td class="text-center" style="white-space: nowrap;">
-            <span class="text-success fw-bolder">{{ $player->wins }}</span> -
-            <span class="text-danger fw-bolder">{{ $player->losses }}</span>
-          </td>
-          <td>
-            @php
-              $winrate = $player->games_played > 0 ? ($player->wins / $player->games_played) * 100 : 0;
-            @endphp
-            @if ($player->games_played > 0)
-            <div class="d-flex flex-column">
-              <span>
-                <span class="{{ $winrate >= 60 ? 'text-success' : ($winrate >= 40 ? 'text-warning' : 'text-danger') }}">
-                  {{ number_format($winrate, 0) }}%
-                </span> W/L
-              </span>
-              <hr>
-              <span>{{ number_format($player->total_score / $player->games_played, 2) }} Goals</span>
-            </div>
-            @else
-              N/A
-            @endif
-          </td>
-        </tr>
-        @endforeach
-      </tbody>
-    </table>
-  </div>
-
-  <div class="mb-4">
-    <a href="{{ route("games.store") }}" class="btn btn-gradient-dark">Record Game</a>
-  </div>
+<div class="d-flex justify-content-center my-4">
+    <div class="card m-2" style="width: 18rem;">
+        <img src="{{ asset('storage/' . $player->avatar) }}" class="card-img-top" alt="{{ $player->name }}" style="aspect-ratio: 1 / 1; object-fit: cover; width: 100%; height: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">{{ $player->name }}</h5>
+            <p class="card-text">Wins: {{ $player->wins }}</p>
+            <p class="card-text">Loses: {{ $player->losses }}</p>
+            <p class="card-text">Elo: {{ $player->elo }}</p>
+        </div>
+    </div>
+</div>
 
   {{-- Match History --}}
   <h1 class="text-center mb-3">Match History</h1>
@@ -76,10 +31,12 @@
       <tbody>
         @foreach ($games as $game)
         <tr>
-          <td class="d-none d-md-table-cell">{{ $game->created_at->setTimezone('Europe/Paris')->format('M d, Y - H:i') }}</td>
+           <td class="d-none d-md-table-cell result-{{ $game->result }}">
+               {{ $game->created_at->setTimezone('Europe/Paris')->format('M d, Y - H:i') }}
+           </td>
 
           {{-- Winners --}}
-          <td>
+          <td class="result-{{ $game->result }}">
             @php
               $winnerPlayers = [[$game->winner1, $game->winner1_elo_change ?? 0], [$game->winner2, $game->winner2_elo_change ?? 0]];
             @endphp
@@ -96,12 +53,12 @@
           </td>
 
           {{-- Score --}}
-          <td class="text-center align-middle">
+          <td class="text-center align-middle result-{{ $game->result }}">
             {{ $game->winner_score }} - {{ $game->loser_score }}
           </td>
 
           {{-- Losers --}}
-          <td>
+          <td class="result-{{ $game->result }}">
             @php
               $loserPlayers = [[$game->loser1, $game->loser1_elo_change ?? 0], [$game->loser2, $game->loser2_elo_change ?? 0]];
             @endphp
@@ -121,11 +78,6 @@
       </tbody>
     </table>
   </div>
-
-  <div class="mb-4">
-    <a href="{{ route("players.register") }}" class="btn btn-gradient-dark">Register Player</a>
-  </div>
-
 
   <script>
     document.querySelectorAll("th.sortable").forEach((header, index) => {
@@ -154,4 +106,3 @@
     });
   </script>
   @endsection
-
