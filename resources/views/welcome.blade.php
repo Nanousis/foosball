@@ -88,7 +88,7 @@
                 <div class="d-flex align-items-center mb-1">
                   <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
                        style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
-                  <a href="/users/{{ $player->id }}/games" class="text-decoration-none text-reset">{{ $player->name }}</a>
+                  <a href="{{ route('players.games', ['id' => $player->id]) }}" class="text-decoration-none text-reset">{{ $player->name }}</a>
                   <span class="ms-1 text-success">(+{{ round($change) }})</span>
                 </div>
               @endif
@@ -110,7 +110,7 @@
                 <div class="d-flex align-items-center mb-1">
                   <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
                        style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
-                  <a href="/users/{{ $player->id }}/games" class="text-decoration-none text-reset">{{ $player->name }}</a>
+                  <a href="{{ route('players.games', ['id' => $player->id]) }}" class="text-decoration-none text-reset">{{ $player->name }}</a>
                   <span class="ms-1 text-danger">({{ round($change) }})</span>
                 </div>
               @endif
