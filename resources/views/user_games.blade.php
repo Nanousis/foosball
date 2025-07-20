@@ -69,7 +69,7 @@
             <td class="text-center align-middle result-{{ $game->result }}">
               {{ $game->winner_score }} - {{ $game->loser_score }}
             </td>
-
+            
             {{-- Losers --}}
             <td class="result-{{ $game->result }}">
               @php

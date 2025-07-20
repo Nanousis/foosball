@@ -21,7 +21,12 @@ h2 {
   background: #343a40;
   color: white;
 }
-
+.avatar {
+    width: 2rem;
+    height: 2rem;
+    clip-path: circle(50%);
+    object-fit: cover;
+}
 .table-hover tbody tr:hover {
   background-color: #e6f0ff;
   cursor: pointer;
@@ -78,6 +83,11 @@ img[alt]:hover {
 
 .gradient-text {
   background: linear-gradient(90deg, #00c6ff, #0072ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gradient-text-danger {
+  background: linear-gradient(90deg, #dc3545, #c82333);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
