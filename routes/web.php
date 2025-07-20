@@ -5,6 +5,20 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\GameController;
 use App\Models\Players;
 use App\Models\Games;
+use Illuminate\Http\Request;
+
+
+Route::post('/api/preview-game', function (Request $request) {
+    $team1 = $request->input('team1'); // array of 2 player IDs
+    $team2 = $request->input('team2');
+    $winner = 'Team 1';
+    $loser = 'Team 2'; 
+    return response()->json([
+        'winner' => $winner,
+        'loser' => $loser,
+        'min_score' => 5,
+    ]);
+})->name('api.preview-game');
 
 Route::get('/', function () {
     $players = Players::orderBy('elo', 'desc')->get();
@@ -26,6 +40,14 @@ Route::get('/record_game', function () {
     return view('record_game', ['players' => $players]);
 })->name('games.store');
 Route::post('/record_game', [GameController::class, 'store'])->name('games.store');
+    
+Route::get('/games/all', function () {
+    $games = Games::with(['winner1', 'winner2', 'loser1', 'loser2'])
+        ->latest()
+        ->get();
+
+    return response()->json($games);
+});
 
 Route::get("/users/{id}/games", function($id) {
     $player = Players::find($id);

@@ -1,8 +1,21 @@
 @extends('layouts.app')
 
 @section('title', 'Foosball Rankings')
-
+@push('head')
+  <style>
+    .link {
+      stroke: #aaa;
+      stroke-width: 1.5px;
+    }
+    text {
+      font-size: 10px;
+      text-anchor: middle;
+      fill: #333;
+    }
+  </style>
+@endpush
 @section('content')
+  <script src="https://d3js.org/d3.v7.min.js"></script>
 
   <h1 class="text-center my-3">
     <span class="">Foosball Rankings</span>
@@ -57,6 +70,16 @@
     </table>
   </div>
 
+
+  <h1 class="text-center my-3">
+    <span class="">Player Correlation Graph</span>
+  </h1>
+  <hr>
+  <div class="graph-container" style="width: 100%; max-width: 1000px; margin: auto;">
+    <svg id="correlation-graph" style="width: 100%; height: auto;"></svg>
+  </div>
+  <hr>
+  
   <div class="mb-4">
     <a href="{{ route("games.store") }}" class="btn btn-gradient-dark">Record Game</a>
   </div>
@@ -152,6 +175,116 @@
         rows.forEach(row => tbody.appendChild(row));
       });
     });
+
+
+    const container = document.querySelector('.graph-container');
+    const svgEl = document.querySelector('#correlation-graph');
+    const width = container.clientWidth;
+    const height = width; // or height = width * 0.6;
+
+    svgEl.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svgEl.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+    const svg = d3.select(svgEl);
+
+    const data = {!! json_encode($games) !!};
+    const nodes = {};
+    const linksMap = new Map();
+
+    for (const game of data) {
+        const teams = [
+        [game.winner1, game.winner2],
+        [game.loser1, game.loser2]
+        ];
+
+        for (const [p1, p2] of teams) {
+        if (!p1 || !p2) continue;
+        const key = [p1.id, p2.id].sort().join('-');
+        linksMap.set(key, (linksMap.get(key) || { source: p1.id, target: p2.id, count: 0, players: [p1, p2] }));
+        linksMap.get(key).count++;
+        // Register nodes
+        nodes[p1.id] = p1;
+        nodes[p2.id] = p2;
+        }
+    }
+
+    const linkData = Array.from(linksMap.values());
+    const nodeData = Object.values(nodes);
+
+    const simulation = d3.forceSimulation(nodeData)
+        .force('link', d3.forceLink(linkData).id(d => d.id).distance(d => 300 / d.count))
+        .force('charge', d3.forceManyBody().strength(-50))
+        .force('center', d3.forceCenter(width / 2, height / 2));
+
+    const link = svg.append('g')
+        .attr('stroke', '#aaa')
+        .selectAll('line')
+        .data(linkData)
+        .join('line')
+        .attr('stroke-width', d => Math.sqrt(d.count));
+
+    const node = svg.append('g')
+        .selectAll('g')
+        .data(nodeData)
+        .join('g')
+        .call(d3.drag()
+        .on('start', dragstarted)
+        .on('drag', dragged)
+        .on('end', dragended));
+
+    node.append('image')
+        .attr('href', d => `https://nanousis.com/foosball/public/storage/${d.avatar}`)
+        .attr('width', 40)
+        .attr('height', 40)
+        .attr('x', -20)
+        .attr('y', -20)
+        .attr('class','avatar');
+
+    node.append('text')
+        .attr('dy', 35)
+        .text(d => d.name);
+
+    simulation.on('tick', () => {
+        link
+        .attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
+
+        node
+        .attr('transform', d => `translate(${d.x},${d.y})`);
+    });
+    simulation.on('tick', () => {
+      node
+        .attr('transform', d => {
+          d.x = Math.max(20, Math.min(width - 50, d.x));
+          d.y = Math.max(20, Math.min(height - 50, d.y));
+          return `translate(${d.x},${d.y})`;
+        });
+
+      link
+        .attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
+    });
+    function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+    }
+
+    function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+    }
+
+    function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
+
   </script>
   @endsection
 
