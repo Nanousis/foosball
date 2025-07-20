@@ -84,7 +84,7 @@
         <hr>
         <p> <span class="gradient-text"> Expected Winner:</span> <span class="winner text-secondary"></span></p>
         <p> <span class="gradient-text-danger"> Expected Loser:</span> <span class="looser text-secondary"></span></p>
-        <p> <span class=""> Min score to gain ELO:</span> <span class="min_score text-secondary"></span></p>
+        <p> <span class=""> Min score to gain Elo:</span> <span class="min_score text-secondary"></span></p>
       </div>
       <hr>
       <div class="mb-4">
@@ -126,7 +126,7 @@ $(function () {
       .then(data => {
         $('.winner').text(data.winner);
         $('.looser').text(data.loser);
-        $('.min_score').text(data.min_score);
+        $('.min_score').text("10-"+data.min_score);
       })
       .catch(err => console.error('API Error:', err));
     }
