@@ -5,36 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Games;
 use App\Models\Players;
-
-function playerKValue($player) {
-    $games = $player->wins + $player->losses;
-
-    return 16 + 14 / (1 + exp($games - 18));
-}
-
-function expectedRating($player, $opponents) {
-    $e1 = 1/(1 + 10**(($opponents[0]->elo - $player->elo)/500));
-    $e2 = 1/(1 + 10**(($opponents[1]->elo - $player->elo)/500));
-
-    return ($e1 + $e2) / 2;
-}
-
-function expectedTeamRating($players, $opponents) {
-    return (expectedRating($players[0], $opponents) + expectedRating($players[1], $opponents)) / 2;
-}
-
-function eloChange($players, $opponents, $i, $did_win) {
-    $player_rating = expectedRating($players[$i], $opponents);
-    $k = playerKValue($players[$i]);
-
-
-    $actual_score = 0;
-    if ($did_win) {
-        $actual_score = 1;
-    }
-
-    return $k * ($actual_score - $player_rating);
-}
+use App\Utils\Glicko2;
+use Carbon\Carbon;
 
 class GameController extends Controller
 {
@@ -75,10 +47,26 @@ class GameController extends Controller
             Players::find($losers[1])
         ];
 
-        $winner1_elo_change = eloChange($winner_players, $loser_players, 0, true);
-        $winner2_elo_change = eloChange($winner_players, $loser_players, 1, true);
-        $loser1_elo_change  = eloChange($loser_players, $winner_players, 0, false);
-        $loser2_elo_change  = eloChange($loser_players, $winner_players, 1, false);
+        $winner1_new_rating = Glicko2::updateRating($winner_players[0], Carbon::today());
+        $winner2_new_rating = Glicko2::updateRating($winner_players[1], Carbon::today());
+        $loser1_new_rating = Glicko2::updateRating($loser_players[0], Carbon::today());
+        $loser2_new_rating = Glicko2::updateRating($loser_players[1], Carbon::today());
+
+        $winner1_elo_change = $winner1_new_rating - $winner_players[0]->last_displayed_rating;
+        $winner2_elo_change = $winner2_new_rating - $winner_players[1]->last_displayed_rating;
+        $loser1_elo_change = $loser1_new_rating - $loser_players[0]->last_displayed_rating;
+        $loser2_elo_change = $loser2_new_rating - $loser_players[1]->last_displayed_rating;
+
+        $winner_elo = [
+            $winner1_new_rating,
+            $winner2_new_rating,
+        ];
+
+        $loser_elo = [
+            $loser1_new_rating,
+            $loser2_new_rating,
+        ];
+
 
         Games::create([
             'winner1_id' => $winners[0],
@@ -98,8 +86,8 @@ class GameController extends Controller
         foreach ($winner_players as $i => $player) {
             if ($player) {
                 $player->increment('wins');
-                $elo_change =  eloChange($winner_players, $loser_players, $i, true);;
-                $player->elo += $elo_change;
+                $player->elo = $winner_elo[$i];
+                $player->last_displayed_rating = $winner_elo[$i];
                 $player->total_score += $winner_score;
                 $player->games_played += 1;
                 $player->save();
@@ -110,8 +98,8 @@ class GameController extends Controller
         foreach ($loser_players as $i => $player) {
             if ($player) {
                 $player->increment('losses');
-                $elo_change = eloChange($loser_players, $winner_players, $i, false);
-                $player->elo += $elo_change;
+                $player->elo = $loser_elo[$i];
+                $player->last_displayed_rating = $loser_elo[$i];
                 $player->total_score += $loser_score;
                 $player->games_played += 1;
                 $player->save();

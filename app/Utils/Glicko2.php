@@ -143,7 +143,25 @@ class Glicko2 {
         return $nextDay;
     }
 
-      public static function updateAllPlayersForDay(Carbon $day) {
+    public static function getGameOdds($team1, $team2) {
+        $mu_1 = getTeamMu($team1[0], $team1[1]);
+        $phi_1 = getTeamPhi($team1[0], $team1[1]);
+
+        $mu_2 = getTeamMu($team2[0], $team2[1]);
+        $phi_2 = getTeamPhi($team2[0], $team2[1]);
+
+        if ($mu_1 > $mu_2) {
+            $e = glickoE($mu_1, $mu_2, $phi_2);
+            $e = min(max($e, 0.1), 0.9);
+            return [1, $e];
+        } else {
+            $e = glickoE($mu_2, $mu_1, $phi_1);
+            $e = min(max($e, 0.1), 0.9);
+            return [2, $e];
+        }
+    }
+
+    public static function updateAllPlayersForDay(Carbon $day) {
         $players = Players::all();
 
         $modified_players = [];
