@@ -45,8 +45,8 @@ class GameController extends Controller
             'team1.*' => 'required|exists:players,id|distinct',
             'team2' => 'required|array|size:2',
             'team2.*' => 'required|exists:players,id|distinct|different:team1.0|different:team1.1',
-            'team1_score' => 'required|integer|min:0',
-            'team2_score' => 'required|integer|min:0',
+            'team1_score' => 'required|integer',
+            'team2_score' => 'required|integer',
             'password' => 'required|string|min:2',
         ]);
         if( $validated['password'] !== env('APP_PASSWORD')) {
