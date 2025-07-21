@@ -22,20 +22,21 @@ class RatingUtils {
         echo "Recomputing Elo...\n";
         self::recomputeElo();
         echo "Done!\n";
-        $players = Players::orderBy('rating', 'desc')->get();
+
+        $players = Players::orderBy('elo', 'desc')->get();
         foreach ($players as $player) {
             $rd = $player->rd * 2;
-            echo "$player->name: $player->rating +- $rd\n";
+            echo "$player->name: $player->elo +- $rd\n";
         }
     }
 
     static function resetRatings() {
         DB::table('players')->update([
             'elo'                   => 0,
+            'last_displayed_rating' => 0,
             'rating'                => STARTING_RATING,
             'rd'                    => STARTING_RD,
             'volatility'            => STARTING_VOLATILITY,
-            'last_displayed_rating' => STARTING_RATING,
         ]);
 
         DB::table('games')->update([
@@ -55,9 +56,6 @@ class RatingUtils {
               ->get();
 
         foreach ($games as $gi => $game) {
-            $game->game_rated = true;
-            $game->save();
-
             $players = [
                 'winner1' => $game->winner1,
                 'winner2' => $game->winner2,
@@ -66,13 +64,14 @@ class RatingUtils {
             ];
 
             foreach ($players as $k => $player) {
-                $newRating = Glicko2::updateRating($player, $game->created_at);
+                $newRating = Glicko2::updateRating($player, $game->created_at, $game);
                 $delta = $newRating - $player->last_displayed_rating;
                 $player->last_displayed_rating = $newRating;
                 $game[$k . "_elo_change"] = $delta;
 
                 $player->save();
             }
+            $game->game_rated = true;
             $game->save();
         }
 

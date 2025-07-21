@@ -95,7 +95,7 @@ function normalizeScore($plr, $opp) {
 }
 
 class Glicko2 {
-    public static function updateRating($player, $day) {
+    public static function updateRating($player, $day, $game) {
         $currentDay = self::getCurrentRatingDay()->startOfDay();
         $day = $day->startOfDay();
 
@@ -112,6 +112,9 @@ class Glicko2 {
                   ->orWhere('loser1_id', $player->id)
                   ->orWhere('loser2_id', $player->id);
             })->get();
+
+        $gamesPlayedToday[] = $game;
+
 
         $mod = self::performRatingPeriodUpdate($player, $gamesPlayedToday);
         return $mod['rating'];

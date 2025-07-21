@@ -47,15 +47,31 @@ class GameController extends Controller
             Players::find($losers[1])
         ];
 
-        $winner1_new_rating = Glicko2::updateRating($winner_players[0], Carbon::today());
-        $winner2_new_rating = Glicko2::updateRating($winner_players[1], Carbon::today());
-        $loser1_new_rating = Glicko2::updateRating($loser_players[0], Carbon::today());
-        $loser2_new_rating = Glicko2::updateRating($loser_players[1], Carbon::today());
+        $new_game = Games::create([
+            'winner1_id' => $winners[0],
+            'winner2_id' => $winners[1],
+            'loser1_id' => $losers[0],
+            'loser2_id' => $losers[1],
+            'winner_score' => $winner_score,
+            'loser_score' => $loser_score,
+            'game_rated' => false,
+            'winner1_elo_change' => 0,
+            'winner2_elo_change' => 0,
+            'loser1_elo_change'  => 0,
+            'loser2_elo_change'  => 0,
+        ]);
 
-        $winner1_elo_change = $winner1_new_rating - $winner_players[0]->last_displayed_rating;
-        $winner2_elo_change = $winner2_new_rating - $winner_players[1]->last_displayed_rating;
-        $loser1_elo_change = $loser1_new_rating - $loser_players[0]->last_displayed_rating;
-        $loser2_elo_change = $loser2_new_rating - $loser_players[1]->last_displayed_rating;
+        $winner1_new_rating = Glicko2::updateRating($winner_players[0], Carbon::today(), $new_game);
+        $winner2_new_rating = Glicko2::updateRating($winner_players[1], Carbon::today(), $new_game);
+        $loser1_new_rating = Glicko2::updateRating($loser_players[0], Carbon::today(), $new_game);
+        $loser2_new_rating = Glicko2::updateRating($loser_players[1], Carbon::today(), $new_game);
+
+        $new_game->winner1_elo_change = $winner1_new_rating - $winner_players[0]->last_displayed_rating;
+        $new_game->winner2_elo_change = $winner2_new_rating - $winner_players[1]->last_displayed_rating;
+        $new_game->loser1_elo_change = $loser1_new_rating - $loser_players[0]->last_displayed_rating;
+        $new_game->loser2_elo_change = $loser2_new_rating - $loser_players[1]->last_displayed_rating;
+        $new_game->game_rated = true;
+        $new_game->save();
 
         $winner_elo = [
             $winner1_new_rating,
@@ -68,20 +84,10 @@ class GameController extends Controller
         ];
 
 
-        Games::create([
-            'winner1_id' => $winners[0],
-            'winner2_id' => $winners[1],
-            'loser1_id' => $losers[0],
-            'loser2_id' => $losers[1],
-            'winner_score' => $winner_score,
-            'loser_score' => $loser_score,
-            'winner1_elo_change' => round($winner1_elo_change),
-            'winner2_elo_change' => round($winner2_elo_change),
-            'loser1_elo_change'  => round($loser1_elo_change),
-            'loser2_elo_change'  => round($loser2_elo_change),
-        ]);
-
-
+        $w1n = $winner_players[0]->name;
+        $w2n = $winner_players[1]->name;
+        $l1n = $loser_players[0]->name;
+        $l2n = $loser_players[1]->name;
 
         foreach ($winner_players as $i => $player) {
             if ($player) {
