@@ -80,7 +80,6 @@ class GameController extends Controller
         $loser1_elo_change  = eloChange($loser_players, $winner_players, 0, false);
         $loser2_elo_change  = eloChange($loser_players, $winner_players, 1, false);
 
-        
         Games::create([
             'winner1_id' => $winners[0],
             'winner2_id' => $winners[1],
