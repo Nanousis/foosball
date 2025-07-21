@@ -79,7 +79,7 @@
     <svg id="correlation-graph" style="width: 100%; height: auto;"></svg>
   </div>
   <hr>
-  
+
   <div class="mb-4">
     <a href="{{ route("games.store") }}" class="btn btn-gradient-dark">Record Game</a>
   </div>
@@ -112,7 +112,12 @@
                   <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
                        style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
                   <a href="{{ route('players.games', ['id' => $player->id]) }}" class="text-decoration-none text-reset">{{ $player->name }}</a>
-                  <span class="ms-1 text-success">(+{{ round($change) }})</span>
+
+                  @if ($change > 0)
+                      <span class="ms-1 text-success">(+{{ round($change) }})</span>
+                  @else
+                      <span class="ms-1 text-danger">({{ round($change) }})</span>
+                  @endif
                 </div>
               @endif
             @endforeach
@@ -134,7 +139,11 @@
                   <img src="{{ asset('storage/' . $player->avatar) }}" alt="{{ $player->name }}"
                        style="width: 24px; height: 24px; object-fit: cover; border-radius: 50%; margin-right: 6px;">
                   <a href="{{ route('players.games', ['id' => $player->id]) }}" class="text-decoration-none text-reset">{{ $player->name }}</a>
-                  <span class="ms-1 text-danger">({{ round($change) }})</span>
+                  @if ($change > 0)
+                      <span class="ms-1 text-success">(+{{ round($change) }})</span>
+                  @else
+                      <span class="ms-1 text-danger">({{ round($change) }})</span>
+                  @endif
                 </div>
               @endif
             @endforeach
